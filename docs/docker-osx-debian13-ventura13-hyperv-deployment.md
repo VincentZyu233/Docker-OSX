@@ -91,6 +91,13 @@ locale
 
 安装期间保持容器运行。安装完成后如果重回 Recovery，重启并从 `Macintosh HD` 启动；安装进度和系统文件都保存在 `data/mac_hdd_ng.img`。
 
+安装器显示的剩余时间是动态估算，在 QEMU 中可能长时间停留在 `1 hour` 以上，并不等于卡死。只要 WebUI 还能刷新画面、容器状态是 `running`，且 Debian 上 `data/mac_hdd_ng.img` 的实际占用或 QEMU 写入量继续增长，就应耐心等待，不要点击 `Cancel`、重启容器或删除磁盘。若连续较长时间完全没有磁盘写入，再提供最新截图和下面的输出：
+
+```bash
+docker inspect docker-osx-ventura13 --format 'status={{.State.Status}} restarts={{.RestartCount}}'
+ls -lh /root/docker-osx/data/mac_hdd_ng.img
+```
+
 ## macOS 内安装 Homebrew、Fish 和 Fastfetch
 
 以下命令在 macOS Ventura 桌面内的 Terminal 执行。当前虚拟机是 Intel x86_64，Homebrew 默认路径为 `/usr/local`。首次安装若提示 Command Line Tools，按提示安装并重新运行 Homebrew 安装命令。
