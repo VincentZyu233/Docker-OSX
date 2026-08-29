@@ -67,6 +67,18 @@ http://192.168.31.67:8006/vnc.html?host=192.168.31.67&port=8006
 
 50922 是 macOS 来宾 SSH 转发端口，不是 WebUI 端口。不要把 5900 原始 VNC 端口暴露到局域网。
 
+## Debian SSH 中文显示
+
+如果 SSH 终端把中文文件名显示成 `\\345\\270...` 形式，重新登录或执行下面命令加载 UTF-8 locale：
+
+```bash
+export LANG=C.UTF-8
+export LANGUAGE=C
+locale
+```
+
+本机 `/root/.profile` 已设置 `LANG=C.UTF-8`。Windows Terminal、PowerShell 或 PuTTY 也应选择 UTF-8 编码；修改后重新建立 SSH 连接。
+
 ## macOS 首次安装
 
 打开 WebUI 后会进入 macOS Ventura Recovery：
