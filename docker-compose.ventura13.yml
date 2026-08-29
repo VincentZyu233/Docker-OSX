@@ -27,3 +27,4 @@ services:
       EXTRA: -display none -vnc 0.0.0.0:99
     volumes:
       - ./data/mac_hdd_ng.img:/home/arch/OSX-KVM/mac_hdd_ng.img
+      - ./data/BaseSystem.img:/home/arch/OSX-KVM/BaseSystem.img
