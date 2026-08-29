@@ -67,6 +67,71 @@ http://192.168.31.67:8006/vnc.html?host=192.168.31.67&port=8006
 
 50922 是 macOS 来宾 SSH 转发端口，不是 WebUI 端口。不要把 5900 原始 VNC 端口暴露到局域网。
 
+## macOS 首次安装
+
+打开 WebUI 后会进入 macOS Ventura Recovery：
+
+1. 选择 `Reinstall macOS Ventura`，点击 `Continue`。
+2. 如果没有可用目标磁盘，打开 `Disk Utility`，选择 `View -> Show All Devices`。
+3. 选择约 78 GiB 的 QEMU 内部磁盘，不要选择 Recovery 安装介质，点击 `Erase`。
+4. `Format` 选择 `APFS`，`Scheme` 选择 `GUID Partition Map`，名称可填 `Macintosh HD`。
+5. 退出磁盘工具，重新选择 `Reinstall macOS Ventura`，目标选刚创建的 `Macintosh HD`。
+
+安装期间保持容器运行。安装完成后如果重回 Recovery，重启并从 `Macintosh HD` 启动；安装进度和系统文件都保存在 `data/mac_hdd_ng.img`。
+
+## macOS 内安装 Homebrew、Fish 和 Fastfetch
+
+以下命令在 macOS Ventura 桌面内的 Terminal 执行。当前虚拟机是 Intel x86_64，Homebrew 默认路径为 `/usr/local`。首次安装若提示 Command Line Tools，按提示安装并重新运行 Homebrew 安装命令。
+
+```bash
+xcode-select --install
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+安装完成后，为 zsh 配置 Homebrew 环境（Intel）：
+
+```bash
+echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/usr/local/bin/brew shellenv)"
+brew --version
+```
+
+### 切换 USTC 镜像
+
+USTC 文档推荐通过环境变量切换 Brew 源、API 和 bottle 下载源。写入 `~/.zprofile` 后新开的终端也会生效：
+
+```bash
+cat >> ~/.zprofile <<'EOF'
+export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.ustc.edu.cn/brew.git"
+export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles"
+export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
+EOF
+source ~/.zprofile
+brew update
+```
+
+如果后续要恢复 Homebrew 官方源，先执行 `unset HOMEBREW_BREW_GIT_REMOTE HOMEBREW_BOTTLE_DOMAIN HOMEBREW_API_DOMAIN`，再按 USTC 文档恢复对应 Git remote。
+
+### 安装并设置 Fish
+
+```bash
+brew install fish
+fish --version
+echo "$(brew --prefix)/bin/fish" | sudo tee -a /etc/shells
+chsh -s "$(brew --prefix)/bin/fish"
+```
+
+重新打开 Terminal 或执行 `exec fish` 后即可进入 Fish。需要返回 zsh 时执行 `chsh -s /bin/zsh`。
+
+### 安装 Fastfetch
+
+```bash
+brew install fastfetch
+fastfetch
+```
+
+验收时应看到 `macOS Ventura`、Intel CPU、内存和磁盘信息。Homebrew、Fish 配置和安装的软件都写入持久化 macOS 磁盘，不会随容器重启丢失。
+
 ## 停止与恢复
 
 ```bash
